@@ -842,12 +842,22 @@
   };
 
   const SPEC_COLORS = {
-    'Automation':   PALETTE.green,
-    'Manual':       PALETTE.blue,
-    'SDET':         PALETTE.purple,
-    'Performance':  PALETTE.orange,
-    'Híbrido':      PALETTE.teal,
-    'Otro':         PALETTE.yellow,
+    'Automation':     PALETTE.green,
+    'Manual':         PALETTE.blue,
+    'SDET':           PALETTE.purple,
+    'Performance':    PALETTE.orange,
+    'Híbrido':        PALETTE.teal,
+    'Hybrid':         PALETTE.teal,
+    'Developer':      PALETTE.pink,
+    'Dev':            PALETTE.pink,
+    'Scrum':          PALETTE.yellow,
+    'Agile':          PALETTE.yellow,
+    'PM':             '#60a5fa',
+    'Product':        '#60a5fa',
+    'DevOps':         '#34d399',
+    'QA':             PALETTE.green,
+    'Otro':           '#94a3b8',
+    'Other':          '#94a3b8',
   };
 
   // ─────────────────────────────────────────────────────────────
@@ -993,8 +1003,7 @@
     destroyChart('chart-spec-month');
     // Excluir filas sin mes válido y sin especialización
     const SKIP_MONTHS = ['no month', 'sin mes', 'sin datos', ''];
-    const SKIP_SPECS  = ['sin datos', 'otro', 'no data', ''];
-    const months = [...new Set(vac.map(getMes))]
+    const SKIP_SPECS  = ['sin datos', 'otro', 'no data', 'other', ''];
       .filter(m => m && !SKIP_MONTHS.includes(normalize(m)));
     const specs = [...new Set(vac.map(r => r.especializacion || ''))]
       .filter(s => s && !SKIP_SPECS.includes(normalize(s)));
@@ -1175,7 +1184,7 @@
   function renderCandidatosSpec(can) {
     destroyChart('chart-candidatos-spec');
     const SKIP_MONTHS = ['no month', 'sin mes', 'sin datos', ''];
-    const SKIP_SPECS  = ['sin datos', 'otro', 'no data', ''];
+    const SKIP_SPECS  = ['sin datos', 'otro', 'no data', 'other', ''];
     const months = [...new Set(can.map(getMes))]
       .filter(m => m && !SKIP_MONTHS.includes(normalize(m)));
     const specs = [...new Set(can.map(r => r.especializacion || ''))]
