@@ -599,17 +599,17 @@
         <div class="logo-badge">📡</div>
         <div class="header-titles">
           <h1>Market <span>Intelligence</span></h1>
-          <p>Outpost QA · Mercado laboral QA en México</p>
+          <p>Outpost QA · QA Labor Market in Mexico</p>
         </div>
       </div>
       <div class="header-right">
-        <p class="last-update">Actualizado: <span id="last-update-ts">—</span></p>
+        <p class="last-update">Updated: <span id="last-update-ts">—</span></p>
         <button class="refresh-btn" id="refresh-btn" onclick="loadData()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
             <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
           </svg>
-          Actualizar
+          Refresh
         </button>
       </div>
     </header>
@@ -617,14 +617,14 @@
     <!-- LOADING -->
     <div id="loading-state">
       <div class="loader-ring"></div>
-      <p class="loading-text">Cargando inteligencia de mercado…</p>
+      <p class="loading-text">Loading market intelligence…</p>
     </div>
 
     <!-- ERROR -->
     <div id="error-state">
       <p style="font-size:24px;margin-bottom:8px">⚠️</p>
-      <p id="error-msg" style="font-weight:500">Error al cargar los datos.</p>
-      <p style="font-size:11px;margin-top:6px;color:var(--text-muted)">Verifica la URL del Apps Script y vuelve a intentar.</p>
+      <p id="error-msg" style="font-weight:500">Failed to load data.</p>
+      <p style="font-size:11px;margin-top:6px;color:var(--text-muted)">Check the Apps Script URL and try again.</p>
     </div>
 
     <!-- DASHBOARD -->
@@ -632,8 +632,8 @@
 
       <!-- KPIs -->
       <div class="section-label">
-        <h2>Resumen general</h2>
-        <div class="pill pill-green">Vacantes + Candidatos</div>
+        <h2>Overview</h2>
+        <div class="pill pill-green">Job Openings + Candidates</div>
         <div class="section-line"></div>
       </div>
 
@@ -641,39 +641,39 @@
         <div class="kpi-card green">
           <span class="kpi-icon">💼</span>
           <div class="kpi-value" id="kpi-vacantes">—</div>
-          <div class="kpi-label">Vacantes registradas</div>
-          <div class="kpi-sub" id="kpi-vacantes-mes">— este mes</div>
+          <div class="kpi-label">Job openings tracked</div>
+          <div class="kpi-sub" id="kpi-vacantes-mes">— this month</div>
         </div>
         <div class="kpi-card blue">
           <span class="kpi-icon">👤</span>
           <div class="kpi-value" id="kpi-candidatos">—</div>
-          <div class="kpi-label">Candidatos en mercado</div>
-          <div class="kpi-sub" id="kpi-candidatos-mes">— este mes</div>
+          <div class="kpi-label">Candidates in market</div>
+          <div class="kpi-sub" id="kpi-candidatos-mes">— this month</div>
         </div>
         <div class="kpi-card orange">
           <span class="kpi-icon">🤖</span>
           <div class="kpi-value" id="kpi-ai">—</div>
-          <div class="kpi-label">Señal AI/Automation</div>
-          <div class="kpi-sub">del total de vacantes</div>
+          <div class="kpi-label">AI/Automation signal</div>
+          <div class="kpi-sub">of total job openings</div>
         </div>
         <div class="kpi-card purple">
           <span class="kpi-icon">🌐</span>
           <div class="kpi-value" id="kpi-ingles">—</div>
-          <div class="kpi-label">Requieren inglés</div>
-          <div class="kpi-sub">avanzado o fluido</div>
+          <div class="kpi-label">Require English</div>
+          <div class="kpi-sub">advanced or fluent</div>
         </div>
         <div class="kpi-card green" style="--accent:#4f9cf9;--accent-dim:rgba(79,156,249,0.12);--border-glow:rgba(79,156,249,0.25);">
           <span class="kpi-icon">🏠</span>
           <div class="kpi-value" id="kpi-remoto" style="color:var(--accent2)">—</div>
-          <div class="kpi-label">Vacantes remotas</div>
-          <div class="kpi-sub">del total registrado</div>
+          <div class="kpi-label">Remote openings</div>
+          <div class="kpi-sub">of total tracked</div>
         </div>
       </div>
 
-      <!-- VACANTES POR ESPECIALIZACIÓN POR MES -->
+      <!-- JOB OPENINGS BY SPECIALIZATION BY MONTH -->
       <div class="section-label" style="margin-top:40px">
-        <h2>Demanda del mercado</h2>
-        <div class="pill pill-green">Vacantes</div>
+        <h2>Market Demand</h2>
+        <div class="pill pill-green">Job Openings</div>
         <div class="section-line"></div>
       </div>
 
@@ -681,10 +681,10 @@
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Vacantes por Especialización QA</div>
-              <div class="chart-subtitle">Evolución mensual acumulada</div>
+              <div class="chart-title">Job Openings by QA Specialization</div>
+              <div class="chart-subtitle">Monthly cumulative evolution</div>
             </div>
-            <span class="chart-badge pill-green">Mensual</span>
+            <span class="chart-badge pill-green">Monthly</span>
           </div>
           <div class="chart-container" style="height:260px">
             <canvas id="chart-spec-month"></canvas>
@@ -694,10 +694,10 @@
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Señal AI/Automation & Requisito de inglés</div>
-              <div class="chart-subtitle">Porcentaje mensual del total de vacantes</div>
+              <div class="chart-title">AI/Automation Signal & English Requirement</div>
+              <div class="chart-subtitle">Monthly percentage of total job openings</div>
             </div>
-            <span class="chart-badge pill-orange">Tendencia</span>
+            <span class="chart-badge pill-orange">Trend</span>
           </div>
           <div class="chart-container" style="height:260px">
             <canvas id="chart-ai-ingles"></canvas>
@@ -705,15 +705,15 @@
         </div>
       </div>
 
-      <!-- STACKS + MODALIDAD -->
+      <!-- STACKS + WORK MODE -->
       <div class="chart-grid-2" style="margin-top:16px">
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Top 10 Stacks más solicitados</div>
-              <div class="chart-subtitle">Por frecuencia en vacantes</div>
+              <div class="chart-title">Top 10 Most In-Demand Tech Stacks</div>
+              <div class="chart-subtitle">By frequency across job openings</div>
             </div>
-            <span class="chart-badge pill-blue">Demanda</span>
+            <span class="chart-badge pill-blue">Demand</span>
           </div>
           <div class="chart-container" style="height:280px">
             <canvas id="chart-stacks"></canvas>
@@ -723,8 +723,8 @@
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Distribución por Modalidad</div>
-              <div class="chart-subtitle">Remoto · Híbrido · Presencial</div>
+              <div class="chart-title">Work Mode Distribution</div>
+              <div class="chart-subtitle">Remote · Hybrid · On-site</div>
             </div>
             <span class="chart-badge pill-green">Mix</span>
           </div>
@@ -734,10 +734,10 @@
         </div>
       </div>
 
-      <!-- CANDIDATOS + GAP -->
+      <!-- CANDIDATES + GAP -->
       <div class="section-label" style="margin-top:40px">
-        <h2>Oferta del mercado</h2>
-        <div class="pill pill-green" style="--accent-dim:rgba(167,139,250,0.12);--accent:#a78bfa;--border-glow:rgba(167,139,250,0.25);">Candidatos disponibles</div>
+        <h2>Market Supply</h2>
+        <div class="pill pill-green" style="--accent-dim:rgba(167,139,250,0.12);--accent:#a78bfa;--border-glow:rgba(167,139,250,0.25);">Available Candidates</div>
         <div class="section-line"></div>
       </div>
 
@@ -745,10 +745,10 @@
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Candidatos por Especialización QA</div>
-              <div class="chart-subtitle">Personas buscando empleo en el mercado</div>
+              <div class="chart-title">Candidates by QA Specialization</div>
+              <div class="chart-subtitle">People actively seeking employment</div>
             </div>
-            <span class="chart-badge" style="background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25)">Oferta</span>
+            <span class="chart-badge" style="background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25)">Supply</span>
           </div>
           <div class="chart-container" style="height:260px">
             <canvas id="chart-candidatos-spec"></canvas>
@@ -758,8 +758,8 @@
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Gap: Demanda vs Oferta por Especialización</div>
-              <div class="chart-subtitle">Vacantes activas vs candidatos disponibles</div>
+              <div class="chart-title">Gap: Demand vs Supply by Specialization</div>
+              <div class="chart-subtitle">Active openings vs available candidates</div>
             </div>
             <span class="chart-badge pill-orange">Gap</span>
           </div>
@@ -769,10 +769,10 @@
         </div>
       </div>
 
-      <!-- TOP EMPRESAS -->
+      <!-- TOP COMPANIES -->
       <div class="section-label" style="margin-top:40px">
-        <h2>Señales del mercado</h2>
-        <div class="pill" style="background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);">Empresas liberando talento</div>
+        <h2>Market Signals</h2>
+        <div class="pill" style="background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);">Companies releasing talent</div>
         <div class="section-line"></div>
       </div>
 
@@ -780,8 +780,8 @@
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Top empresas que liberan talento QA</div>
-              <div class="chart-subtitle">Mayor número de candidatos en búsqueda activa</div>
+              <div class="chart-title">Top Companies Releasing QA Talent</div>
+              <div class="chart-subtitle">Highest number of candidates actively job-seeking</div>
             </div>
           </div>
           <div class="companies-list" id="companies-list"></div>
@@ -790,8 +790,8 @@
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-title">Modalidad buscada por candidatos</div>
-              <div class="chart-subtitle">Preferencia declarada al buscar empleo</div>
+              <div class="chart-title">Preferred Work Mode by Candidates</div>
+              <div class="chart-subtitle">Declared preference when job-seeking</div>
             </div>
           </div>
           <div class="chart-container" style="height:220px; display:flex; align-items:center; justify-content:center;">
@@ -803,7 +803,7 @@
     </div><!-- end #dashboard-content -->
 
     <footer>
-      <p>Outpost QA · <span>Market Intelligence</span> · Fuente: LinkedIn / Google Sheets</p>
+      <p>Outpost QA · <span>Market Intelligence</span> · Source: LinkedIn / Google Sheets</p>
       <p>Hiram Salazar · Recruitment Manager · <span id="footer-year"></span></p>
     </footer>
 
@@ -858,16 +858,30 @@
     return '$' + Math.round(n).toLocaleString('es-MX');
   }
 
+  const MONTH_MAP = {
+    'enero':'Jan', 'febrero':'Feb', 'marzo':'Mar', 'abril':'Apr',
+    'mayo':'May', 'junio':'Jun', 'julio':'Jul', 'agosto':'Aug',
+    'septiembre':'Sep', 'octubre':'Oct', 'noviembre':'Nov', 'diciembre':'Dec',
+    'ene':'Jan', 'feb':'Feb', 'mar':'Mar', 'abr':'Apr',
+    'may':'May', 'jun':'Jun', 'jul':'Jul', 'ago':'Aug',
+    'sep':'Sep', 'oct':'Oct', 'nov':'Nov', 'dic':'Dec',
+  };
+
+  function translateMonth(raw) {
+    if (!raw) return raw;
+    // Handles formats like "Enero", "ene. 25", "Febrero 2026", "mar-25"
+    return String(raw).replace(/[a-záéíóúñü]+/gi, w => MONTH_MAP[w.toLowerCase()] || w);
+  }
+
   function getMes(row) {
-    // Prefer explicit Mes column, else derive from fecha
-    if (row.mes && row.mes !== '') return String(row.mes).trim();
+    if (row.mes && row.mes !== '') return translateMonth(String(row.mes).trim());
     if (row.fecha && row.fecha !== '') {
       const d = new Date(row.fecha);
       if (!isNaN(d)) {
-        return d.toLocaleString('es-MX', { month: 'short', year: '2-digit' });
+        return translateMonth(d.toLocaleString('es-MX', { month: 'short', year: '2-digit' }));
       }
     }
-    return 'Sin mes';
+    return 'No month';
   }
 
   function normalize(str) {
@@ -902,11 +916,11 @@
       const res = await fetch(APPS_SCRIPT_URL);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      if (data.status !== 'ok') throw new Error(data.message || 'Error en el script');
+      if (data.status !== 'ok') throw new Error(data.message || 'Script error');
 
       cachedData = data;
       document.getElementById('last-update-ts').textContent =
-        new Date(data.timestamp).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' });
+        new Date(data.timestamp).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' });
 
       renderDashboard(data);
 
@@ -944,13 +958,13 @@
     document.getElementById('kpi-vacantes').textContent = vac.length;
     document.getElementById('kpi-candidatos').textContent = can.length;
 
-    // Este mes
+    // This month
     const now = new Date();
     const mesActual = now.toLocaleString('es-MX', { month: 'short', year: '2-digit' });
     const vacMes = vac.filter(r => getMes(r) === mesActual).length;
     const canMes = can.filter(r => getMes(r) === mesActual).length;
-    document.getElementById('kpi-vacantes-mes').textContent = (vacMes || '0') + ' este mes';
-    document.getElementById('kpi-candidatos-mes').textContent = (canMes || '0') + ' este mes';
+    document.getElementById('kpi-vacantes-mes').textContent = (vacMes || '0') + ' this month';
+    document.getElementById('kpi-candidatos-mes').textContent = (canMes || '0') + ' this month';
 
     // AI
     const aiCount = vac.filter(r => {
@@ -978,8 +992,8 @@
   function renderSpecMonth(vac) {
     destroyChart('chart-spec-month');
     // Excluir filas sin mes válido y sin especialización
-    const SKIP_MONTHS = ['sin mes', 'sin datos', ''];
-    const SKIP_SPECS  = ['sin datos', 'otro', ''];
+    const SKIP_MONTHS = ['no month', 'sin mes', 'sin datos', ''];
+    const SKIP_SPECS  = ['sin datos', 'otro', 'no data', ''];
     const months = [...new Set(vac.map(getMes))]
       .filter(m => m && !SKIP_MONTHS.includes(normalize(m)));
     const specs = [...new Set(vac.map(r => r.especializacion || ''))]
@@ -1053,7 +1067,7 @@
             tension: 0.4, fill: true,
           },
           {
-            label: 'Inglés requerido %',
+            label: 'English required %',
             data: ingData,
             borderColor: PALETTE.blue,
             backgroundColor: PALETTE.blue + '22',
@@ -1093,7 +1107,7 @@
       data: {
         labels,
         datasets: [{
-          label: 'Frecuencia',
+          label: 'Frequency',
           data: values,
           backgroundColor: colors.map(c => c + 'bb'),
           borderColor: colors,
@@ -1116,17 +1130,17 @@
   // ── Normaliza modalidad a 4 buckets fijos ─────────────────────
   function normalizeModalidad(raw) {
     const v = normalize(raw || '');
-    if (v.includes('remoto') || v.includes('remote') || v.includes('home')) return 'Remoto';
-    if (v.includes('híbrido') || v.includes('hibrido') || v.includes('hybrid')) return 'Híbrido';
-    if (v.includes('presencial') || v.includes('on-site') || v.includes('onsite') || v.includes('oficina')) return 'Presencial';
-    return 'No especificado';
+    if (v.includes('remoto') || v.includes('remote') || v.includes('home')) return 'Remote';
+    if (v.includes('híbrido') || v.includes('hibrido') || v.includes('hybrid')) return 'Hybrid';
+    if (v.includes('presencial') || v.includes('on-site') || v.includes('onsite') || v.includes('oficina')) return 'On-site';
+    return 'Not specified';
   }
 
-  // ── Modalidad de vacantes ─────────────────────────────────────
+  // ── Work mode — job openings ──────────────────────────────────
   function renderModalidad(vac) {
     destroyChart('chart-modalidad');
-    const BUCKETS = ['Remoto', 'Híbrido', 'Presencial', 'No especificado'];
-    const freq = { 'Remoto': 0, 'Híbrido': 0, 'Presencial': 0, 'No especificado': 0 };
+    const BUCKETS = ['Remote', 'Hybrid', 'On-site', 'Not specified'];
+    const freq = { 'Remote': 0, 'Hybrid': 0, 'On-site': 0, 'Not specified': 0 };
     vac.forEach(r => { freq[normalizeModalidad(r.modalidad)]++; });
     const labels = BUCKETS.filter(b => freq[b] > 0);
     const values = labels.map(l => freq[l]);
@@ -1157,12 +1171,12 @@
 
 
 
-  // ── Candidatos por Especialización ───────────────────────────
+  // ── Candidates by Specialization ─────────────────────────────
   function renderCandidatosSpec(can) {
     destroyChart('chart-candidatos-spec');
     const freq = {};
     can.forEach(r => {
-      const s = r.especializacion || 'Sin datos';
+      const s = r.especializacion || 'No data';
       freq[s] = (freq[s] || 0) + 1;
     });
     const labels = Object.keys(freq).sort((a,b) => freq[b]-freq[a]);
@@ -1174,7 +1188,7 @@
       data: {
         labels,
         datasets: [{
-          label: 'Candidatos',
+          label: 'Candidates',
           data: values,
           backgroundColor: colors.map(c => c + 'aa'),
           borderColor: colors,
@@ -1196,14 +1210,14 @@
   // ── Gap analysis ──────────────────────────────────────────────
   function renderGap(vac, can) {
     const specs = [...new Set([
-      ...vac.map(r => r.especializacion || 'Sin datos'),
-      ...can.map(r => r.especializacion || 'Sin datos'),
-    ])].filter(s => s && s !== 'Sin datos');
+      ...vac.map(r => r.especializacion || 'No data'),
+      ...can.map(r => r.especializacion || 'No data'),
+    ])].filter(s => s && s !== 'No data' && s !== 'Sin datos');
 
     const rows = specs.map(spec => ({
       spec,
-      demand: vac.filter(r => (r.especializacion||'Sin datos') === spec).length,
-      supply: can.filter(r => (r.especializacion||'Sin datos') === spec).length,
+      demand: vac.filter(r => (r.especializacion||'No data') === spec).length,
+      supply: can.filter(r => (r.especializacion||'No data') === spec).length,
     })).sort((a,b) => b.demand - a.demand);
 
     const maxVal = Math.max(...rows.map(r => Math.max(r.demand, r.supply)), 1);
@@ -1211,9 +1225,9 @@
 
     let html = `
       <div class="gap-row gap-row-header">
-        <div>Especialización</div>
-        <div>Demanda (vacantes)</div>
-        <div>Oferta (candidatos)</div>
+        <div>Specialization</div>
+        <div>Demand (openings)</div>
+        <div>Supply (candidates)</div>
         <div style="text-align:center">Gap</div>
       </div>`;
 
@@ -1240,7 +1254,7 @@
     });
 
     if (!rows.length) {
-      html += '<p style="color:var(--text-muted);font-size:12px;padding:12px">Sin datos suficientes para el análisis de gap.</p>';
+      html += '<p style="color:var(--text-muted);font-size:12px;padding:12px">Not enough data for gap analysis.</p>';
     }
 
     container.innerHTML = html;
@@ -1251,7 +1265,7 @@
     const freq = {};
     can.forEach(r => {
       const emp = (r.empresa_anterior || '').trim();
-      if (emp && emp !== '' && normalize(emp) !== 'sin datos') {
+      if (emp && emp !== '' && normalize(emp) !== 'sin datos' && normalize(emp) !== 'no data') {
         freq[emp] = (freq[emp] || 0) + 1;
       }
     });
@@ -1260,7 +1274,7 @@
 
     const container = document.getElementById('companies-list');
     if (!sorted.length) {
-      container.innerHTML = '<p style="color:var(--text-muted);font-size:12px">Sin datos de empresa anterior disponibles.</p>';
+      container.innerHTML = '<p style="color:var(--text-muted);font-size:12px">No previous employer data available.</p>';
       return;
     }
 
@@ -1277,11 +1291,11 @@
       </div>`).join('');
   }
 
-  // ── Modalidad deseada por candidatos ─────────────────────────
+  // ── Preferred work mode — candidates ─────────────────────────
   function renderCandModalidad(can) {
     destroyChart('chart-cand-modalidad');
-    const BUCKETS = ['Remoto', 'Híbrido', 'Presencial', 'No especificado'];
-    const freq = { 'Remoto': 0, 'Híbrido': 0, 'Presencial': 0, 'No especificado': 0 };
+    const BUCKETS = ['Remote', 'Hybrid', 'On-site', 'Not specified'];
+    const freq = { 'Remote': 0, 'Hybrid': 0, 'On-site': 0, 'Not specified': 0 };
     can.forEach(r => { freq[normalizeModalidad(r.modalidad)]++; });
     const labels = BUCKETS.filter(b => freq[b] > 0);
     const values = labels.map(l => freq[l]);
