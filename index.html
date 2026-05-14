@@ -835,29 +835,36 @@
     blue:   '#4f9cf9',
     orange: '#f97316',
     purple: '#a78bfa',
-    pink:   '#ec4899',
+    pink:   '#f472b6',
     yellow: '#fbbf24',
     teal:   '#2dd4bf',
     red:    '#f87171',
+    lime:   '#a3e635',
+    indigo: '#818cf8',
+    rose:   '#fb7185',
+    amber:  '#f59e0b',
+    sky:    '#38bdf8',
+    violet: '#c084fc',
+    emerald:'#34d399',
   };
 
   const SPEC_COLORS = {
-    'Automation':     PALETTE.green,
-    'Manual':         PALETTE.blue,
-    'SDET':           PALETTE.purple,
-    'Performance':    PALETTE.orange,
-    'Híbrido':        PALETTE.teal,
-    'Hybrid':         PALETTE.teal,
-    'Developer':      PALETTE.pink,
-    'Dev':            PALETTE.pink,
-    'Scrum':          PALETTE.yellow,
-    'Agile':          PALETTE.yellow,
-    'PM':             '#60a5fa',
-    'Product':        '#60a5fa',
-    'DevOps':         '#34d399',
-    'QA':             PALETTE.green,
-    'Otro':           '#94a3b8',
-    'Other':          '#94a3b8',
+    'Automation':  '#00d4aa',   // teal-green
+    'Manual':      '#4f9cf9',   // blue
+    'SDET':        '#c084fc',   // violet
+    'Performance': '#f97316',   // orange
+    'Híbrido':     '#fbbf24',   // yellow
+    'Hybrid':      '#fbbf24',   // yellow
+    'Developer':   '#f472b6',   // pink
+    'Dev':         '#f472b6',   // pink
+    'Scrum':       '#a3e635',   // lime
+    'Agile':       '#a3e635',   // lime
+    'PM':          '#38bdf8',   // sky blue
+    'Product':     '#38bdf8',   // sky blue
+    'DevOps':      '#fb7185',   // rose
+    'QA':          '#00d4aa',   // teal-green
+    'Otro':        '#94a3b8',   // gray
+    'Other':       '#94a3b8',   // gray
   };
 
   // ─────────────────────────────────────────────────────────────
@@ -1004,6 +1011,7 @@
     // Excluir filas sin mes válido y sin especialización
     const SKIP_MONTHS = ['no month', 'sin mes', 'sin datos', ''];
     const SKIP_SPECS  = ['sin datos', 'otro', 'no data', 'other', ''];
+    const months = [...new Set(vac.map(getMes))]
       .filter(m => m && !SKIP_MONTHS.includes(normalize(m)));
     const specs = [...new Set(vac.map(r => r.especializacion || ''))]
       .filter(s => s && !SKIP_SPECS.includes(normalize(s)));
@@ -1153,7 +1161,8 @@
     vac.forEach(r => { freq[normalizeModalidad(r.modalidad)]++; });
     const labels = BUCKETS.filter(b => freq[b] > 0);
     const values = labels.map(l => freq[l]);
-    const colors = [PALETTE.green, PALETTE.blue, PALETTE.orange, PALETTE.teal];
+    const MODAL_COLORS = ['#00d4aa', '#4f9cf9', '#f97316', '#94a3b8'];
+    const colors = labels.map((_, i) => MODAL_COLORS[i % MODAL_COLORS.length]);
 
     new Chart('chart-modalidad', {
       type: 'doughnut',
@@ -1311,7 +1320,8 @@
     can.forEach(r => { freq[normalizeModalidad(r.modalidad)]++; });
     const labels = BUCKETS.filter(b => freq[b] > 0);
     const values = labels.map(l => freq[l]);
-    const colors = [PALETTE.purple, PALETTE.pink, PALETTE.orange, PALETTE.teal];
+    const MODAL_COLORS = ['#00d4aa', '#c084fc', '#f97316', '#94a3b8'];
+    const colors = labels.map((_, i) => MODAL_COLORS[i % MODAL_COLORS.length]);
 
     new Chart('chart-cand-modalidad', {
       type: 'doughnut',
