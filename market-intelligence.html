@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Intelligence — Outpost QA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #deeaf7;
+      --bg-card:      #1a2540;
+      --bg-card-alt:  #223058;
+      --border:       rgba(255,255,255,0.10);
+      --border-glow:  rgba(0,212,170,0.35);
+
+      --accent:       #00d4aa;
+      --accent-dim:   rgba(0,212,170,0.15);
+      --accent2:      #4f9cf9;
+      --accent2-dim:  rgba(79,156,249,0.15);
+      --accent3:      #f97316;
+      --accent3-dim:  rgba(249,115,22,0.15);
+      --accent4:      #a78bfa;
+
+      --text-primary:   #eef2f7;
+      --text-secondary: #7a8ba0;
+      --text-muted:     #4a6080;
+
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+
+      --radius:    12px;
+      --radius-lg: 18px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: linear-gradient(160deg, #cfe0f5 0%, #deeaf7 40%, #d0e8f2 100%);
+      color: #1a2540;
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise texture overlay ────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* ── Ambient glow spots ───────────────────────────────── */
+    .ambient {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(79,156,249,0.18) 0%, transparent 70%);
+      top: -200px; left: -200px;
+    }
+    .ambient-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,212,170,0.14) 0%, transparent 70%);
+      bottom: -100px; right: -100px;
+    }
+
+    /* ── Layout ───────────────────────────────────────────── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 20px;
+      border-bottom: 1px solid rgba(26,37,64,0.15);
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+      gap: 16px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px; height: 42px;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      font-size: 20px;
+    }
+
+    .header-titles h1 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #1a2540;
+    }
+    .header-titles h1 span { color: var(--accent2); }
+
+    .header-titles p {
+      font-size: 12px;
+      color: #4a6080;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .last-update {
+      font-size: 11px;
+      color: #4a6080;
+      letter-spacing: 0.3px;
+    }
+    .last-update span {
+      color: var(--accent2);
+      font-weight: 500;
+    }
+
+    .refresh-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-glow);
+      border-radius: 8px;
+      color: var(--accent);
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+    .refresh-btn:hover {
+      background: rgba(0,212,170,0.2);
+      transform: translateY(-1px);
+    }
+    .refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
+
+    /* ── Loading / Error states ───────────────────────────── */
+    #loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: 20px;
+    }
+
+    .loader-ring {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loading-text {
+      font-family: var(--font-display);
+      font-size: 13px;
+      color: #4a6080;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    #error-state {
+      display: none;
+      background: rgba(249,115,22,0.08);
+      border: 1px solid rgba(249,115,22,0.25);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      color: var(--accent3);
+    }
+
+    #dashboard-content { display: none; }
+
+    /* ── Section headers ──────────────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      margin-top: 36px;
+    }
+    .section-label:first-of-type { margin-top: 0; }
+
+    .section-label h2 {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #4a6080;
+    }
+    .section-label .pill {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+    .pill-green { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border-glow); }
+    .pill-blue  { background: var(--accent2-dim); color: var(--accent2); border: 1px solid rgba(79,156,249,0.25); }
+    .pill-orange{ background: var(--accent3-dim); color: var(--accent3); border: 1px solid rgba(249,115,22,0.25); }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(26,37,64,0.15);
+    }
+
+    /* ── KPI Cards ────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s;
+      animation: fadeUp 0.5s ease both;
+    }
+    .kpi-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .kpi-card.green::before { background: linear-gradient(90deg, var(--accent), transparent); }
+    .kpi-card.blue::before  { background: linear-gradient(90deg, var(--accent2), transparent); }
+    .kpi-card.orange::before{ background: linear-gradient(90deg, var(--accent3), transparent); }
+    .kpi-card.purple::before{ background: linear-gradient(90deg, var(--accent4), transparent); }
+
+    .kpi-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .kpi-value {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .kpi-card.green .kpi-value { color: var(--accent); }
+    .kpi-card.blue  .kpi-value { color: var(--accent2); }
+    .kpi-card.orange .kpi-value{ color: var(--accent3); }
+    .kpi-card.purple .kpi-value{ color: var(--accent4); }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+    .kpi-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* ── Chart Cards ──────────────────────────────────────── */
+    .chart-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 16px;
+    }
+
+    .chart-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      transition: border-color 0.25s;
+      animation: fadeUp 0.5s ease both;
+    }
+    .chart-card:hover { border-color: rgba(255,255,255,0.12); }
+
+    .chart-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+
+    .chart-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+    .chart-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 300;
+    }
+
+    .chart-badge {
+      flex-shrink: 0;
+      font-size: 10px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+    }
+    .chart-container canvas { width: 100% !important; }
+
+    /* ── Salary table ─────────────────────────────────────── */
+    .salary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .salary-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .salary-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+    .salary-table tr:last-child td { border-bottom: none; }
+    .salary-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .salary-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .salary-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      flex-shrink: 0;
+      transition: width 0.5s ease;
+    }
+    .salary-range {
+      font-size: 11px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .tag-spec {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--border-glow);
+      font-weight: 500;
+    }
+
+    /* ── Gap analysis ─────────────────────────────────────── */
+    .gap-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .gap-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr 60px;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .gap-row:hover { border-color: rgba(255,255,255,0.1); }
+    .gap-row-header {
+      grid-template-columns: 140px 1fr 1fr 60px;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      background: transparent;
+      border: none;
+    }
+    .gap-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .gap-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .gap-bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .gap-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .bar-demand { background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+    .bar-supply { background: linear-gradient(90deg, var(--accent4), #ec4899); }
+    .gap-count { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-align: right; }
+    .gap-delta {
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .gap-positive { color: #f87171; }
+    .gap-negative { color: var(--accent); }
+    .gap-neutral  { color: var(--text-muted); }
+
+    /* ── Companies list ───────────────────────────────────── */
+    .companies-list { display: flex; flex-direction: column; gap: 8px; }
+    .company-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .company-row:hover {
+      border-color: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+    }
+    .company-rank {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      width: 20px;
+      flex-shrink: 0;
+    }
+    .company-name {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .company-bar-wrap { width: 100px; }
+    .company-bar-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .company-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent4), #ec4899);
+    }
+    .company-count {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent4);
+      width: 24px;
+      text-align: right;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(26,37,64,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p {
+      font-size: 11px;
+      color: #4a6080;
+      letter-spacing: 0.3px;
+    }
+    footer span { color: var(--accent2); }
+
+    /* ── Animations ───────────────────────────────────────── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Stagger chart cards */
+    .chart-card:nth-child(1) { animation-delay: 0.05s; }
+    .chart-card:nth-child(2) { animation-delay: 0.10s; }
+    .chart-card:nth-child(3) { animation-delay: 0.15s; }
+    .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+    .kpi-card:nth-child(2) { animation-delay: 0.10s; }
+    .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+    .kpi-card:nth-child(4) { animation-delay: 0.20s; }
+    .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .wrapper { padding: 0 16px 48px; }
+      .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      header { flex-direction: column; align-items: flex-start; }
+      .gap-row { grid-template-columns: 110px 1fr 1fr 50px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient ambient-1"></div>
+  <div class="ambient ambient-2"></div>
+
+  <div class="wrapper">
+
+    <!-- HEADER -->
+    <header>
+      <div class="header-left">
+        <div class="logo-badge">📡</div>
+        <div class="header-titles">
+          <h1>Market <span>Intelligence</span></h1>
+          <p>Outpost QA · Mercado laboral QA en México</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <p class="last-update">Actualizado: <span id="last-update-ts">—</span></p>
+        <button class="refresh-btn" id="refresh-btn" onclick="loadData()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+            <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+          </svg>
+          Actualizar
+        </button>
+      </div>
+    </header>
+
+    <!-- LOADING -->
+    <div id="loading-state">
+      <div class="loader-ring"></div>
+      <p class="loading-text">Cargando inteligencia de mercado…</p>
+    </div>
+
+    <!-- ERROR -->
+    <div id="error-state">
+      <p style="font-size:24px;margin-bottom:8px">⚠️</p>
+      <p id="error-msg" style="font-weight:500">Error al cargar los datos.</p>
+      <p style="font-size:11px;margin-top:6px;color:var(--text-muted)">Verifica la URL del Apps Script y vuelve a intentar.</p>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard-content">
+
+      <!-- KPIs -->
+      <div class="section-label">
+        <h2>Resumen general</h2>
+        <div class="pill pill-green">Vacantes + Candidatos</div>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card green">
+          <span class="kpi-icon">💼</span>
+          <div class="kpi-value" id="kpi-vacantes">—</div>
+          <div class="kpi-label">Vacantes registradas</div>
+          <div class="kpi-sub" id="kpi-vacantes-mes">— este mes</div>
+        </div>
+        <div class="kpi-card blue">
+          <span class="kpi-icon">👤</span>
+          <div class="kpi-value" id="kpi-candidatos">—</div>
+          <div class="kpi-label">Candidatos en mercado</div>
+          <div class="kpi-sub" id="kpi-candidatos-mes">— este mes</div>
+        </div>
+        <div class="kpi-card orange">
+          <span class="kpi-icon">🤖</span>
+          <div class="kpi-value" id="kpi-ai">—</div>
+          <div class="kpi-label">Señal AI/Automation</div>
+          <div class="kpi-sub">del total de vacantes</div>
+        </div>
+        <div class="kpi-card purple">
+          <span class="kpi-icon">🌐</span>
+          <div class="kpi-value" id="kpi-ingles">—</div>
+          <div class="kpi-label">Requieren inglés</div>
+          <div class="kpi-sub">avanzado o fluido</div>
+        </div>
+        <div class="kpi-card green" style="--accent:#4f9cf9;--accent-dim:rgba(79,156,249,0.12);--border-glow:rgba(79,156,249,0.25);">
+          <span class="kpi-icon">🏠</span>
+          <div class="kpi-value" id="kpi-remoto" style="color:var(--accent2)">—</div>
+          <div class="kpi-label">Vacantes remotas</div>
+          <div class="kpi-sub">del total registrado</div>
+        </div>
+      </div>
+
+      <!-- VACANTES POR ESPECIALIZACIÓN POR MES -->
+      <div class="section-label" style="margin-top:40px">
+        <h2>Demanda del mercado</h2>
+        <div class="pill pill-green">Vacantes</div>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Vacantes por Especialización QA</div>
+              <div class="chart-subtitle">Evolución mensual acumulada</div>
+            </div>
+            <span class="chart-badge pill-green">Mensual</span>
+          </div>
+          <div class="chart-container" style="height:260px">
+            <canvas id="chart-spec-month"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Señal AI/Automation & Requisito de inglés</div>
+              <div class="chart-subtitle">Porcentaje mensual del total de vacantes</div>
+            </div>
+            <span class="chart-badge pill-orange">Tendencia</span>
+          </div>
+          <div class="chart-container" style="height:260px">
+            <canvas id="chart-ai-ingles"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- STACKS + MODALIDAD -->
+      <div class="chart-grid-2" style="margin-top:16px">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Top 10 Stacks más solicitados</div>
+              <div class="chart-subtitle">Por frecuencia en vacantes</div>
+            </div>
+            <span class="chart-badge pill-blue">Demanda</span>
+          </div>
+          <div class="chart-container" style="height:280px">
+            <canvas id="chart-stacks"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Distribución por Modalidad</div>
+              <div class="chart-subtitle">Remoto · Híbrido · Presencial</div>
+            </div>
+            <span class="chart-badge pill-green">Mix</span>
+          </div>
+          <div class="chart-container" style="height:280px; display:flex; align-items:center; justify-content:center;">
+            <canvas id="chart-modalidad" style="max-height:260px; max-width:260px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CANDIDATOS + GAP -->
+      <div class="section-label" style="margin-top:40px">
+        <h2>Oferta del mercado</h2>
+        <div class="pill pill-green" style="--accent-dim:rgba(167,139,250,0.12);--accent:#a78bfa;--border-glow:rgba(167,139,250,0.25);">Candidatos disponibles</div>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Candidatos por Especialización QA</div>
+              <div class="chart-subtitle">Personas buscando empleo en el mercado</div>
+            </div>
+            <span class="chart-badge" style="background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25)">Oferta</span>
+          </div>
+          <div class="chart-container" style="height:260px">
+            <canvas id="chart-candidatos-spec"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Gap: Demanda vs Oferta por Especialización</div>
+              <div class="chart-subtitle">Vacantes activas vs candidatos disponibles</div>
+            </div>
+            <span class="chart-badge pill-orange">Gap</span>
+          </div>
+          <div id="gap-container" class="gap-grid" style="margin-top:8px">
+            <!-- rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP EMPRESAS -->
+      <div class="section-label" style="margin-top:40px">
+        <h2>Señales del mercado</h2>
+        <div class="pill" style="background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);">Empresas liberando talento</div>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Top empresas que liberan talento QA</div>
+              <div class="chart-subtitle">Mayor número de candidatos en búsqueda activa</div>
+            </div>
+          </div>
+          <div class="companies-list" id="companies-list"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Modalidad buscada por candidatos</div>
+              <div class="chart-subtitle">Preferencia declarada al buscar empleo</div>
+            </div>
+          </div>
+          <div class="chart-container" style="height:220px; display:flex; align-items:center; justify-content:center;">
+            <canvas id="chart-cand-modalidad" style="max-height:220px; max-width:220px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end #dashboard-content -->
+
+    <footer>
+      <p>Outpost QA · <span>Market Intelligence</span> · Fuente: LinkedIn / Google Sheets</p>
+      <p>Hiram Salazar · Recruitment Manager · <span id="footer-year"></span></p>
+    </footer>
+
+  </div><!-- end .wrapper -->
+
+  <script>
+  // ─────────────────────────────────────────────────────────────
+  // CONFIGURACIÓN — reemplaza con tu URL del Apps Script
+  // ─────────────────────────────────────────────────────────────
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxm_lHjsNfoqt_XO41eBMMmOvBaLgh1KdmvWnG2KE-mJpreQo96tSY9SMOqUVkkoCmedw/exec';
+
+  // ─────────────────────────────────────────────────────────────
+  // Chart.js defaults
+  // ─────────────────────────────────────────────────────────────
+  Chart.defaults.color = '#7a8ba0';
+  Chart.defaults.font.family = "'DM Sans', sans-serif";
+  Chart.defaults.font.size = 11;
+  Chart.defaults.plugins.legend.labels.boxWidth = 10;
+  Chart.defaults.plugins.legend.labels.padding = 14;
+  Chart.defaults.plugins.tooltip.backgroundColor = '#1a2235';
+  Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.08)';
+  Chart.defaults.plugins.tooltip.borderWidth = 1;
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.titleColor = '#eef2f7';
+  Chart.defaults.plugins.tooltip.bodyColor = '#7a8ba0';
+
+  const PALETTE = {
+    green:  '#00d4aa',
+    blue:   '#4f9cf9',
+    orange: '#f97316',
+    purple: '#a78bfa',
+    pink:   '#ec4899',
+    yellow: '#fbbf24',
+    teal:   '#2dd4bf',
+    red:    '#f87171',
+  };
+
+  const SPEC_COLORS = {
+    'Automation':   PALETTE.green,
+    'Manual':       PALETTE.blue,
+    'SDET':         PALETTE.purple,
+    'Performance':  PALETTE.orange,
+    'Híbrido':      PALETTE.teal,
+    'Otro':         PALETTE.yellow,
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────────────────────
+  function fmtMXN(n) {
+    if (!n && n !== 0) return '—';
+    return '$' + Math.round(n).toLocaleString('es-MX');
+  }
+
+  function getMes(row) {
+    // Prefer explicit Mes column, else derive from fecha
+    if (row.mes && row.mes !== '') return String(row.mes).trim();
+    if (row.fecha && row.fecha !== '') {
+      const d = new Date(row.fecha);
+      if (!isNaN(d)) {
+        return d.toLocaleString('es-MX', { month: 'short', year: '2-digit' });
+      }
+    }
+    return 'Sin mes';
+  }
+
+  function normalize(str) {
+    return (str || '').trim().toLowerCase();
+  }
+
+  function getSpecColor(spec) {
+    for (const [key, color] of Object.entries(SPEC_COLORS)) {
+      if (normalize(spec).includes(normalize(key))) return color;
+    }
+    return PALETTE.yellow;
+  }
+
+  function destroyChart(id) {
+    const existing = Chart.getChart(id);
+    if (existing) existing.destroy();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // DATA LOAD
+  // ─────────────────────────────────────────────────────────────
+  let cachedData = null;
+
+  async function loadData() {
+    const btn = document.getElementById('refresh-btn');
+    btn.classList.add('spinning');
+    document.getElementById('loading-state').style.display = 'flex';
+    document.getElementById('dashboard-content').style.display = 'none';
+    document.getElementById('error-state').style.display = 'none';
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (data.status !== 'ok') throw new Error(data.message || 'Error en el script');
+
+      cachedData = data;
+      document.getElementById('last-update-ts').textContent =
+        new Date(data.timestamp).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' });
+
+      renderDashboard(data);
+
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('dashboard-content').style.display = 'block';
+    } catch (err) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+      document.getElementById('error-msg').textContent = 'Error: ' + err.message;
+    } finally {
+      btn.classList.remove('spinning');
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // RENDER DASHBOARD
+  // ─────────────────────────────────────────────────────────────
+  function renderDashboard(data) {
+    const vac = data.vacantes   || [];
+    const can = data.buscan_empleo || [];
+
+    renderKPIs(vac, can);
+    renderSpecMonth(vac);
+    renderAiIngles(vac);
+    renderStacks(vac);
+    renderModalidad(vac);
+    renderCandidatosSpec(can);
+    renderGap(vac, can);
+    renderCompanies(can);
+    renderCandModalidad(can);
+  }
+
+  // ── KPIs ──────────────────────────────────────────────────────
+  function renderKPIs(vac, can) {
+    document.getElementById('kpi-vacantes').textContent = vac.length;
+    document.getElementById('kpi-candidatos').textContent = can.length;
+
+    // Este mes
+    const now = new Date();
+    const mesActual = now.toLocaleString('es-MX', { month: 'short', year: '2-digit' });
+    const vacMes = vac.filter(r => getMes(r) === mesActual).length;
+    const canMes = can.filter(r => getMes(r) === mesActual).length;
+    document.getElementById('kpi-vacantes-mes').textContent = (vacMes || '0') + ' este mes';
+    document.getElementById('kpi-candidatos-mes').textContent = (canMes || '0') + ' este mes';
+
+    // AI
+    const aiCount = vac.filter(r => {
+      const v = normalize(r.senal_ai || '');
+      return v === 'sí' || v === 'si' || v === 'yes' || v === '1' || v === 'true';
+    }).length;
+    const aiPct = vac.length ? Math.round(aiCount / vac.length * 100) : 0;
+    document.getElementById('kpi-ai').textContent = aiPct + '%';
+
+    // Inglés
+    const ingCount = vac.filter(r => {
+      const v = normalize(r.requiere_ingles || '');
+      return v === 'sí' || v === 'si' || v === 'avanzado' || v === 'fluido' || v === 'yes' || v === '1';
+    }).length;
+    const ingPct = vac.length ? Math.round(ingCount / vac.length * 100) : 0;
+    document.getElementById('kpi-ingles').textContent = ingPct + '%';
+
+    // Remoto
+    const remCount = vac.filter(r => normalize(r.modalidad || '').includes('remoto')).length;
+    const remPct = vac.length ? Math.round(remCount / vac.length * 100) : 0;
+    document.getElementById('kpi-remoto').textContent = remPct + '%';
+  }
+
+  // ── Vacantes por Especialización por Mes ──────────────────────
+  function renderSpecMonth(vac) {
+    destroyChart('chart-spec-month');
+    // Excluir filas sin mes válido y sin especialización
+    const SKIP_MONTHS = ['sin mes', 'sin datos', ''];
+    const SKIP_SPECS  = ['sin datos', 'otro', ''];
+    const months = [...new Set(vac.map(getMes))]
+      .filter(m => m && !SKIP_MONTHS.includes(normalize(m)));
+    const specs = [...new Set(vac.map(r => r.especializacion || ''))]
+      .filter(s => s && !SKIP_SPECS.includes(normalize(s)));
+
+    const datasets = specs.map(spec => {
+      const color = getSpecColor(spec);
+      return {
+        label: spec,
+        data: months.map(m => vac.filter(r => getMes(r) === m && (r.especializacion || '') === spec).length),
+        backgroundColor: color + '33',
+        borderColor: color,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: color,
+        tension: 0.4,
+        fill: false,
+      };
+    });
+
+    new Chart('chart-spec-month', {
+      type: 'line',
+      data: { labels: months, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { maxRotation: 45 } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true, ticks: { stepSize: 1, precision: 0 } }
+        }
+      }
+    });
+  }
+
+  // ── AI + Inglés por mes ───────────────────────────────────────
+  function renderAiIngles(vac) {
+    destroyChart('chart-ai-ingles');
+    const months = [...new Set(vac.map(getMes))].filter(Boolean);
+
+    const aiData = months.map(m => {
+      const mVac = vac.filter(r => getMes(r) === m);
+      if (!mVac.length) return 0;
+      const ai = mVac.filter(r => {
+        const v = normalize(r.senal_ai || '');
+        return v === 'sí' || v === 'si' || v === 'yes' || v === '1';
+      }).length;
+      return Math.round(ai / mVac.length * 100);
+    });
+
+    const ingData = months.map(m => {
+      const mVac = vac.filter(r => getMes(r) === m);
+      if (!mVac.length) return 0;
+      const ing = mVac.filter(r => {
+        const v = normalize(r.requiere_ingles || '');
+        return v === 'sí' || v === 'si' || v === 'avanzado' || v === 'fluido' || v === 'yes' || v === '1';
+      }).length;
+      return Math.round(ing / mVac.length * 100);
+    });
+
+    new Chart('chart-ai-ingles', {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: 'AI/Automation %',
+            data: aiData,
+            borderColor: PALETTE.orange,
+            backgroundColor: PALETTE.orange + '22',
+            borderWidth: 2, pointRadius: 4, pointBackgroundColor: PALETTE.orange,
+            tension: 0.4, fill: true,
+          },
+          {
+            label: 'Inglés requerido %',
+            data: ingData,
+            borderColor: PALETTE.blue,
+            backgroundColor: PALETTE.blue + '22',
+            borderWidth: 2, pointRadius: 4, pointBackgroundColor: PALETTE.blue,
+            tension: 0.4, fill: true,
+          },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true, max: 100,
+               ticks: { callback: v => v + '%' } }
+        }
+      }
+    });
+  }
+
+  // ── Top Stacks ────────────────────────────────────────────────
+  function renderStacks(vac) {
+    destroyChart('chart-stacks');
+    const freq = {};
+    vac.forEach(r => {
+      const stacks = (r.stack_principal || '').split(/[,;\/\+]/).map(s => s.trim()).filter(Boolean);
+      stacks.forEach(s => { freq[s] = (freq[s] || 0) + 1; });
+    });
+    const sorted = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0, 10);
+    const labels = sorted.map(e => e[0]);
+    const values = sorted.map(e => e[1]);
+    const colors = [PALETTE.green, PALETTE.blue, PALETTE.orange, PALETTE.purple, PALETTE.teal,
+                    PALETTE.yellow, PALETTE.pink, PALETTE.red, '#60a5fa', '#34d399'];
+
+    new Chart('chart-stacks', {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Frecuencia',
+          data: values,
+          backgroundColor: colors.map(c => c + 'bb'),
+          borderColor: colors,
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true, ticks: { stepSize: 1 } },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // ── Normaliza modalidad a 4 buckets fijos ─────────────────────
+  function normalizeModalidad(raw) {
+    const v = normalize(raw || '');
+    if (v.includes('remoto') || v.includes('remote') || v.includes('home')) return 'Remoto';
+    if (v.includes('híbrido') || v.includes('hibrido') || v.includes('hybrid')) return 'Híbrido';
+    if (v.includes('presencial') || v.includes('on-site') || v.includes('onsite') || v.includes('oficina')) return 'Presencial';
+    return 'No especificado';
+  }
+
+  // ── Modalidad de vacantes ─────────────────────────────────────
+  function renderModalidad(vac) {
+    destroyChart('chart-modalidad');
+    const BUCKETS = ['Remoto', 'Híbrido', 'Presencial', 'No especificado'];
+    const freq = { 'Remoto': 0, 'Híbrido': 0, 'Presencial': 0, 'No especificado': 0 };
+    vac.forEach(r => { freq[normalizeModalidad(r.modalidad)]++; });
+    const labels = BUCKETS.filter(b => freq[b] > 0);
+    const values = labels.map(l => freq[l]);
+    const colors = [PALETTE.green, PALETTE.blue, PALETTE.orange, PALETTE.teal];
+
+    new Chart('chart-modalidad', {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors.map(c => c + 'cc'),
+          borderColor: colors,
+          borderWidth: 1,
+          hoverOffset: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/values.reduce((a,b)=>a+b,0)*100)}%)` }}
+        },
+        cutout: '60%',
+      }
+    });
+  }
+
+
+
+  // ── Candidatos por Especialización ───────────────────────────
+  function renderCandidatosSpec(can) {
+    destroyChart('chart-candidatos-spec');
+    const freq = {};
+    can.forEach(r => {
+      const s = r.especializacion || 'Sin datos';
+      freq[s] = (freq[s] || 0) + 1;
+    });
+    const labels = Object.keys(freq).sort((a,b) => freq[b]-freq[a]);
+    const values = labels.map(l => freq[l]);
+    const colors = labels.map(l => getSpecColor(l));
+
+    new Chart('chart-candidatos-spec', {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Candidatos',
+          data: values,
+          backgroundColor: colors.map(c => c + 'aa'),
+          borderColor: colors,
+          borderWidth: 1,
+          borderRadius: 5,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+      }
+    });
+  }
+
+  // ── Gap analysis ──────────────────────────────────────────────
+  function renderGap(vac, can) {
+    const specs = [...new Set([
+      ...vac.map(r => r.especializacion || 'Sin datos'),
+      ...can.map(r => r.especializacion || 'Sin datos'),
+    ])].filter(s => s && s !== 'Sin datos');
+
+    const rows = specs.map(spec => ({
+      spec,
+      demand: vac.filter(r => (r.especializacion||'Sin datos') === spec).length,
+      supply: can.filter(r => (r.especializacion||'Sin datos') === spec).length,
+    })).sort((a,b) => b.demand - a.demand);
+
+    const maxVal = Math.max(...rows.map(r => Math.max(r.demand, r.supply)), 1);
+    const container = document.getElementById('gap-container');
+
+    let html = `
+      <div class="gap-row gap-row-header">
+        <div>Especialización</div>
+        <div>Demanda (vacantes)</div>
+        <div>Oferta (candidatos)</div>
+        <div style="text-align:center">Gap</div>
+      </div>`;
+
+    rows.forEach(row => {
+      const demW = Math.round(row.demand / maxVal * 100);
+      const supW = Math.round(row.supply / maxVal * 100);
+      const gap  = row.demand - row.supply;
+      const gapClass = gap > 0 ? 'gap-positive' : gap < 0 ? 'gap-negative' : 'gap-neutral';
+      const gapText = gap > 0 ? '+' + gap : String(gap);
+
+      html += `
+        <div class="gap-row">
+          <div class="gap-label">${row.spec}</div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-track"><div class="gap-bar-fill bar-demand" style="width:${demW}%"></div></div>
+            <span class="gap-count">${row.demand}</span>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-track"><div class="gap-bar-fill bar-supply" style="width:${supW}%"></div></div>
+            <span class="gap-count">${row.supply}</span>
+          </div>
+          <div class="gap-delta ${gapClass}">${gapText}</div>
+        </div>`;
+    });
+
+    if (!rows.length) {
+      html += '<p style="color:var(--text-muted);font-size:12px;padding:12px">Sin datos suficientes para el análisis de gap.</p>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  // ── Top Empresas que liberan talento ──────────────────────────
+  function renderCompanies(can) {
+    const freq = {};
+    can.forEach(r => {
+      const emp = (r.empresa_anterior || '').trim();
+      if (emp && emp !== '' && normalize(emp) !== 'sin datos') {
+        freq[emp] = (freq[emp] || 0) + 1;
+      }
+    });
+    const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxV = sorted.length ? sorted[0][1] : 1;
+
+    const container = document.getElementById('companies-list');
+    if (!sorted.length) {
+      container.innerHTML = '<p style="color:var(--text-muted);font-size:12px">Sin datos de empresa anterior disponibles.</p>';
+      return;
+    }
+
+    container.innerHTML = sorted.map(([name, count], i) => `
+      <div class="company-row">
+        <span class="company-rank">#${i+1}</span>
+        <span class="company-name">${name}</span>
+        <div class="company-bar-wrap">
+          <div class="company-bar-track">
+            <div class="company-bar-fill" style="width:${Math.round(count/maxV*100)}%"></div>
+          </div>
+        </div>
+        <span class="company-count">${count}</span>
+      </div>`).join('');
+  }
+
+  // ── Modalidad deseada por candidatos ─────────────────────────
+  function renderCandModalidad(can) {
+    destroyChart('chart-cand-modalidad');
+    const BUCKETS = ['Remoto', 'Híbrido', 'Presencial', 'No especificado'];
+    const freq = { 'Remoto': 0, 'Híbrido': 0, 'Presencial': 0, 'No especificado': 0 };
+    can.forEach(r => { freq[normalizeModalidad(r.modalidad)]++; });
+    const labels = BUCKETS.filter(b => freq[b] > 0);
+    const values = labels.map(l => freq[l]);
+    const colors = [PALETTE.purple, PALETTE.pink, PALETTE.orange, PALETTE.teal];
+
+    new Chart('chart-cand-modalidad', {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors.map(c => c + 'cc'),
+          borderColor: colors,
+          borderWidth: 1,
+          hoverOffset: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` }}
+        },
+        cutout: '55%',
+      }
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────────────────────
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+  loadData();
+  </script>
+</body>
+</html>
